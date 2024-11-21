@@ -47,7 +47,7 @@ const Header = () => {
                         <Link to="/">Home</Link>
                     </Navbar.Link>
                     <Navbar.Link active={path === "/Head"} as={"div"}>
-                        <Link to="/">Head-Page</Link>
+                        <Link to="/Head">Head-Page</Link>
                     </Navbar.Link>
                     
                     <Navbar.Link active={path === "/budget"} as={"div"}>

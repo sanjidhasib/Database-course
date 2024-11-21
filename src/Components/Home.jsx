@@ -1,174 +1,157 @@
-import  { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaMoneyCheckAlt, FaUsers, FaTasks, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Users, Users2, ClipboardCheck, Receipt, History, BarChart3 } from "lucide-react";
+import { Button } from "@mui/material";
+import { Link, NavLink } from "react-router-dom";
 
 const Home = () => {
-    const [budgets, setBudgets] = useState([]);
-    const [committees, setCommittees] = useState([]);
-    const [events, setEvents] = useState([]);
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        totalCommittees: 0,
+        approvedBudgets: 0,
+        totalTransactions: 0,
+        fundBalance: 0,
+    });
 
-  
+    const [features, setFeatures] = useState([
+        {
+            title: "Users Management",
+            description: "Add, edit, or remove users in the system.",
+            icon: Users,
+            color: "bg-purple-500",
+            lightColor: "bg-purple-100",
+            link: "/user",
+        },
+        {
+            title: "Committee Management",
+            description: "Create and manage event or improvement committees.",
+            icon: Users2,
+            color: "bg-pink-500",
+            lightColor: "bg-pink-100",
+            link: "/committee",
+        },
+        {
+            title: "Budget Approvals",
+            description: "Review and approve or reject proposed budgets.",
+            icon: ClipboardCheck,
+            color: "bg-green-500",
+            lightColor: "bg-green-100",
+            link: "/budget",
+        },
+        {
+            title: "Transaction Records",
+            description: "View all financial transactions in detail.",
+            icon: Receipt,
+            color: "bg-orange-500",
+            lightColor: "bg-orange-100",
+            link: "/transaction",
+        },
+        {
+            title: "Fund History",
+            description: "Track the complete history of fund allocations.",
+            icon: History,
+            color: "bg-blue-500",
+            lightColor: "bg-blue-100",
+            link: "/fund",
+        },
+      
+    ]);
+
+    // Fetch Dashboard Data
     useEffect(() => {
-        axios.get('http://localhost:5004/budgets')
-            .then(response => {
-                setBudgets(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching budgets: ", error);
-            });
+        const fetchData = async () => {
+            try {
+                const [usersRes, committeesRes, fundsRes, transactionsRes] = await Promise.all([
+                    axios.get("http://localhost:5004/users"),
+                    axios.get("http://localhost:5004/committees"),
+                    axios.get("http://localhost:5004/funds/total"),
+                    axios.get("http://localhost:5004/transactions"),
+                ]);
+
+                setStats({
+                    totalUsers: usersRes.data.length,
+                    totalCommittees: committeesRes.data.length,
+                    approvedBudgets: 45, // Placeholder: Replace with a dynamic count from backend
+                    totalTransactions: transactionsRes.data.length,
+                    fundBalance: fundsRes.data.totalAmount || 0,
+                });
+            } catch (err) {
+                console.error("Error fetching data:", err);
+            }
+        };
+
+        fetchData();
     }, []);
-
-    useEffect(() => {
-        axios.get('http://localhost:5004/committees')
-            .then(response => {
-                setCommittees(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching committees: ", error);
-            });
-    }, []);
-
-    
-    useEffect(() => {
-        axios.get('http://localhost:5004/events')
-            .then(response => {
-                setEvents(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching events: ", error);
-            });
-    }, []);
-
-    
-    const handleEventDecision = (eventId, status) => {
-        if (!eventId) {
-            console.error("Error: Event ID is undefined."); 
-            return;
-        }
-
-        axios.patch(`http://localhost:5004/events/${eventId}`, { status })
-            .then(response => {
-                console.log("Response data:", response.data); 
-               
-                setEvents(prevEvents => prevEvents.map(event => 
-                    event.id === eventId ? { ...event, status } : event
-                ));
-            })
-            .catch(error => {
-                console.error("Error updating event status: ", error);
-            });
-    };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-100 to-indigo-200">
-            {/* Banner Section */}
-            <div className="relative h-64 bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)' }}>
-                <div className="flex flex-col justify-center items-center h-full bg-black bg-opacity-40">
-                    <h1 className="text-4xl text-white font-bold">Finance Management System</h1>
-                    <p className="text-md text-center text-white mt-2">
-                        The Finance Management System is an integrated platform designed to streamline budgeting, expense tracking, and financial reporting within organizations. It enhances transparency and accountability by enabling users to efficiently manage funds, track transactions, and oversee committee activities. 
-                    </p>
-                </div>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-pink-50">
+            {/* Header */}
+            <header className="bg-white/70 backdrop-blur-sm border-b border-indigo-100">
+                
+            </header>
 
-            {/* Project Overview */}
-            <div className="container mx-auto mt-8 text-center px-4">
-                <h2 className="text-2xl font-semibold">Project Overview</h2>
-                <p className="mt-4 text-gray-700">
-                    This Finance Management System allows heads to manage committees, allocate budgets, track transactions, and oversee events seamlessly. The objective is to promote financial transparency and accountability within academic disciplines.
-                </p>
-            </div>
-
-            {/* Overview Cards */}
-            <div className="container mx-auto mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
-                <div className="bg-blue-600 text-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                    <FaMoneyCheckAlt size={50} />
-                    <h3 className="text-xl font-semibold mt-4">Total Funds</h3>
-                    <p className="text-3xl mt-2">${budgets.reduce((total, budget) => total + budget.amount, 0)}</p>
-                </div>
-                <div className="bg-red-600 text-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                    <FaUsers size={50} />
-                    <h3 className="text-xl font-semibold mt-4">Active Committees</h3>
-                    <p className="text-3xl mt-2">{committees.length}</p>
-                </div>
-                <div className="bg-green-600 text-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                    <FaTasks size={50} />
-                    <h3 className="text-xl font-semibold mt-4">Budgets in Progress</h3>
-                    <p className="text-3xl mt-2">{budgets.filter(budget => budget.spent < budget.amount).length}</p>
-                </div>
-            </div>
-
-            {/* Budgets Progress Section */}
-            <div className="container mx-auto mt-8 px-4">
-                <h2 className="text-2xl font-semibold text-center">Budgets Progress</h2>
-                <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-                    {budgets.map((budget) => (
-                        <div key={budget.id} className="mb-4">
-                            <h4 className="font-semibold">{budget.category}</h4>
-                            <div className="h-2 bg-gray-200 rounded">
-                                <div className="h-full bg-green-500 rounded" style={{ width: `${(budget.spent / budget.amount) * 100}%` }} />
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                    <div className="flex flex-col md:flex-row items-center justify-between">
+                        <div className="md:w-1/2 mb-8 md:mb-0">
+                            <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">Welcome to the Committee Management System!</h2>
+                            <p className="text-xl mb-6 text-indigo-100">Effortlessly manage users, committees, budgets, and transactions in one place.</p>
+                            <button  type="button" className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-white font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Show now</button>
+                        </div>
+                        <div className="md:w-1/2 flex justify-center">
+                            <div className="w-64 h-64 relative">
+                                <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+                                <svg className="w-64 h-64 text-white relative z-10" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                </svg>
                             </div>
-                            <p className="text-sm text-gray-600">{Math.round((budget.spent / budget.amount) * 100)}% of the budget used</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Features Grid */}
+            
+
+            
+
+            {/* Features Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {features.map((feature, index) => {
+                        const Icon = feature.icon;
+                        return (
+                            <Link to={feature.link} key={index} className="bg-white p-6 rounded-lg shadow hover:shadow-lg">
+                                <div className={`p-4 rounded-lg ${feature.lightColor} inline-block`}>
+                                    <Icon className={`${feature.color} h-6 w-6`} />
+                                </div>
+                                <h3 className="mt-4 text-lg font-bold">{feature.title}</h3>
+                                <p className="text-gray-600">{feature.description}</p>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Stats Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h3 className="text-2xl font-bold mb-6 text-gray-800">Dashboard Overview</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {[
+                        { label: "Total Users", value: stats.totalUsers, icon: Users, color: "bg-purple-500", lightColor: "bg-purple-100" },
+                        { label: "Total Committees", value: stats.totalCommittees, icon: Users2, color: "bg-pink-500", lightColor: "bg-pink-100" },
+                        { label: "Budgets Approved", value: stats.approvedBudgets, icon: ClipboardCheck, color: "bg-green-500", lightColor: "bg-green-100" },
+                        { label: "Total Transactions", value: stats.totalTransactions, icon: Receipt, color: "bg-orange-500", lightColor: "bg-orange-100" },
+                        { label: "Fund Balance", value: `$${stats.fundBalance.toLocaleString()}`, icon: History, color: "bg-blue-500", lightColor: "bg-blue-100" },
+                    ].map((stat, index) => (
+                        <div key={index} className="bg-white p-4 rounded-lg shadow text-center">
+                            <div className={`inline-block p-4 rounded-full ${stat.lightColor}`}>
+                                <stat.icon className={`${stat.color} h-6 w-6`} />
+                            </div>
+                            <p className="mt-2 text-sm text-gray-500">{stat.label}</p>
+                            <p className="text-xl font-bold text-gray-800">{stat.value}</p>
                         </div>
                     ))}
-                </div>
-            </div>
-
-            {/* Quick Actions Section */}
-            <div className="container mx-auto mt-8 px-4 mb-8">
-                <h2 className="text-2xl font-semibold">Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="bg-purple-600 text-white p-6 rounded-lg shadow-lg text-center">
-                        <h3 className="text-xl font-semibold">Approve Budgets</h3>
-                        <p className="mt-2">Review and approve pending budget requests.</p>
-                        <Link to="/manage-budgets" className="inline-block mt-4 px-4 py-2 bg-white text-purple-600 rounded">Go to Budgets</Link>
-                    </div>
-                    <div className="bg-blue-600 text-white p-6 rounded-lg shadow-lg text-center">
-                        <h3 className="text-xl font-semibold">Manage Events</h3>
-                        <p className="mt-2">View and approve event funding requests.</p>
-                        <Link to="/event" className="inline-block mt-4 px-4 py-2 bg-white text-blue-600 rounded">Go to Events</Link>
-                    </div>
-                </div>
-            </div>
-
-            {/* Admin Review Section */}
-            <div className="container mx-auto mt-8 px-4">
-                <h2 className="text-2xl font-semibold text-center">Admin Review Section</h2>
-                <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-                    <h3 className="text-xl font-semibold">Pending Events</h3>
-                    {events.length === 0 ? (
-                        <p className="text-gray-600">No pending events to review.</p>
-                    ) : (
-                        events.filter(event => event.status === 'pending').map((event) => (
-                            <div key={event.id} className="flex justify-between items-center mb-4">
-                                <div>
-                                    <h4 className="font-semibold">{event.title}</h4>
-                                    <p className="text-sm text-gray-600">Requested by: {event.creator_email}</p>
-                                </div>
-                                <div className="flex space-x-2">
-                                    <button 
-                                        className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-                                        onClick={() => {
-                                            console.log(event); 
-                                            handleEventDecision(event.id, 'approved'); 
-                                        }}
-                                    >
-                                        <FaCheckCircle /> Approve
-                                    </button>
-                                    <button 
-                                        className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-                                        onClick={() => {
-                                            console.log(event); 
-                                            handleEventDecision(event.id, 'rejected'); 
-                                        }}
-                                    >
-                                        <FaTimesCircle /> Reject
-                                    </button>
-                                </div>
-                            </div>
-                        ))
-                    )}
                 </div>
             </div>
         </div>

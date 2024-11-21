@@ -1,6 +1,7 @@
 
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
+import Footer from './Footer';
 
 
 
@@ -9,8 +10,9 @@ const Root = () => {
         <div>
             <Header></Header>
            <div className='container mx-auto'>
-                <Outlet></Outlet>
+                <Outlet></Outlet> 
            </div>
+            <Footer></Footer>
         </div>
     );
 };

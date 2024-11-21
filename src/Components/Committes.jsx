@@ -109,13 +109,13 @@ const CommitteesOverview = () => {
 
             {/* Committee List */}
             <div className="overflow-x-auto">
-                <table className="table w-full table-zebra">
+                <table className="table w-full table-zebra text-xxl">
                     <thead>
                         <tr>
-                            <th className="text-left">Committee Name</th>
-                            <th className="text-left">Members</th>
-                            <th className="text-left">Proposals</th>
-                            <th className="text-left">Actions</th>
+                            <th className="text-left text-2xl">Committee Name</th>
+                            <th className="text-left text-2xl">Members</th>
+                            <th className="text-left text-2xl">Proposals</th>
+                            <th className="text-left text-2xl">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,7 +123,7 @@ const CommitteesOverview = () => {
                             <tr key={committee.Committee_ID}>
                                 <td className="py-4 px-2">
                                     <button
-                                        className="text-blue-500 underline"
+                                        className=" font-semibold text-2xl text-white "
                                         onClick={() => setSelectedCommittee(committee)}
                                     >
                                         {committee.Committee_Name}
